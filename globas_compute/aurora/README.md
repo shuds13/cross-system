@@ -1,5 +1,8 @@
 # Globus Compute on Aurora
 
+Sends a batch of calculations that run on one GPU tile each. Be default uses one node
+on Aurora. Run configuration can be modified in run_config.yaml.
+
 ## On Aurora
 
 The file `globus_config_file/user_config_template.yaml.j2` must be copied to Aurora.
