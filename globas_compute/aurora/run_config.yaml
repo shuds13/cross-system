@@ -1,0 +1,4 @@
+account: datascience
+queue: debug
+num_nodes: 1
+walltime: "00:10:00"
