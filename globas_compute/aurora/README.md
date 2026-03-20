@@ -78,8 +78,8 @@ globus-compute-endpoint list
 
 ## Example Output on 2 nodes (24 tasks)
 
-tasks 1-12 on x4707c0s**6**b0n0.
-tasks 13-24 on x4707c0s**7**b0n0.
+Tasks 1-12 on `x4707c0s**6**b0n0`.
+Tasks 13-24 on `x4707c0s**7**b0n0`.
 
 ```bash
 python run_aurora.py
