@@ -1,5 +1,4 @@
 import os
-import pprint
 import yaml
 from globus_compute_sdk import Executor
 
@@ -9,7 +8,8 @@ NUM_TASKS = 24  # >= num nodes * accelerators per node
 with open("run_config.yaml") as f:
     USER_RUN_CONFIG = yaml.safe_load(f)
 
-def gpu_multiply_check(task_id, n=1000000):
+
+def gpu_multiply(task_id, n=1000000):
     """Multiply two tensors"""
     import os
     import socket
@@ -31,11 +31,12 @@ def gpu_multiply_check(task_id, n=1000000):
         "last": float(c[-1].cpu()),
     }
 
+
 with Executor(
     endpoint_id=ENDPOINT_ID,
     user_endpoint_config=USER_RUN_CONFIG,
 ) as ex:
-    futs = [ex.submit(gpu_multiply_check, task_id) for task_id in range(1, NUM_TASKS + 1)]
+    futs = [ex.submit(gpu_multiply, task_id) for task_id in range(1, NUM_TASKS + 1)]
     results = [f.result() for f in futs]
     for r in results:
         print(r)

@@ -36,7 +36,7 @@ Start endpoint and copy the endpoint ID provided
 globus-compute-endpoint start aurora_test
 ```
 
-You may need to authenticate on Globas (via a link if given).
+You may need to authenticate on Globus (via a link if given).
 
 
 ## Laptop / front-end
