@@ -54,6 +54,8 @@ python run_aurora.py
 
 On Aurora, start a new terminal.
 
+To see jobs added to queue.
+
 ```bash
 qstat -fu $USER
 ```
