@@ -1,14 +1,18 @@
 import os
+import pprint
 import yaml
 from globus_compute_sdk import Executor
 
 ENDPOINT_ID = os.environ["GLOBUS_COMPUTE_ENDPOINT_ID"]
-NUM_TASKS = 12
+NUM_TASKS = 24  # >= num nodes * accelerators per node
 
 with open("run_config.yaml") as f:
     USER_RUN_CONFIG = yaml.safe_load(f)
 
-def gpu_multiply_check(task_id, n=1000):
+def gpu_multiply_check(task_id, n=1000000):
+    """Multiply two tensors"""
+    import os
+    import socket
     import torch
 
     device = "xpu"
@@ -21,7 +25,8 @@ def gpu_multiply_check(task_id, n=1000):
 
     return {
         "task_id": task_id,
-        "device": str(c.device),
+        "hostname": socket.gethostname(),
+        "GPU tile": os.environ.get("ZE_AFFINITY_MASK"),
         "first": float(c[0].cpu()),
         "last": float(c[-1].cpu()),
     }
@@ -32,4 +37,5 @@ with Executor(
 ) as ex:
     futs = [ex.submit(gpu_multiply_check, task_id) for task_id in range(1, NUM_TASKS + 1)]
     results = [f.result() for f in futs]
-    print(results)
+    for r in results:
+        print(r)
