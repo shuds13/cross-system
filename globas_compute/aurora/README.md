@@ -43,7 +43,7 @@ You may need to authenticate on Globus (via a link if given).
 
 Check:
 - Ensure Python version matches that on Aurora.
-- Your Aurora project (account) is set in `run_config.yaml'
+- Your Aurora project (account) is set in `run_config.yaml`
 
 Set the environment variable used in the Python script and run.
 
@@ -55,7 +55,7 @@ python run_aurora.py
 
 This may take a while as the job will have to queue on Aurora before running.
 
-To use more nodes go to `run_config.yaml` and increase nodes. Also
+To use more nodes, increase `num_nodes` in `run_config.yaml`, and
 make sure `NUM_TASKS` in `run_aurora.py` is enough to use all nodes.
 
 
@@ -77,6 +77,9 @@ globus-compute-endpoint list
 ```
 
 ## Example Output on 2 nodes (24 tasks)
+
+Tasks 1–12 ran on `x4707c0s6b0n0`
+Tasks 13–24 ran on `x4707c0s7b0n0`
 
 ```bash
 python run_aurora.py
