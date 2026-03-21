@@ -1,0 +1,22 @@
+{
+  "pre_launch": "source <remote_dir>/_amsc_libe_env/bin/activate",
+  "executable": "python",
+  "arguments": ["run_libe.py"],
+  "directory": "<remote_dir>/run_test",
+  "name": "my-job",
+  "inherit_environment": true,
+  "stdout_path": "<remote_dir>/run_test/job.out",
+  "stderr_path": "<remote_dir>/run_test/job.err",
+  "resources": {
+    "node_count": 1,
+    "exclusive_node_use": true
+  },
+  "attributes": {
+    "duration": 10,
+    "queue_name": "debug",
+    "account": "<project_id>",
+    "custom_attributes": {
+      "constraint": "cpu"
+    }
+  }
+}
