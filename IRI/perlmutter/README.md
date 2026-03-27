@@ -1,6 +1,6 @@
 # IRI Perlmutter
 
-> **Note:** This is Work In Progress. May NOT currently work. And process likely to change.
+> **Note:** This is Work In Progress.
 
 > **Note:** Example running a Python workflow (need to add example with srun launcher).
 
@@ -8,37 +8,29 @@ Submit to Perlmutter via IRI interface.
 
 These instructions use the Rest API directly.
 
+## Pre-requisite
+
+Requires authorization to use IRI at NERSC.
+
+Need `token_manager.py` script.
+
 ## Authorization
 
-First you must obtain a Auth token (currently uses SFAPI tokens).
+First you must obtain an IRI Auth token.
 
-Log in at https://iris.nersc.gov
-
-Go to `Profile` in blue ribbon.
-
-Scroll down to `Superfacility API Clients` and click + **New Client**
-
-Ref: https://docs.nersc.gov/services/sfapi/authentication/
-
-In box:
-    Choose a client name, select "Create Globus Token" and move slider to Red.
-    Use "IP Presets" dropdown box. Select where you will run from:
-        e.g., From your own computer select "Your IP". To run from Spin, select that.
-    -> OK
-
-You will be guided through Globus auth (Download your client_id private key - including PEM version).
-
-
-## Obtain token
+On your client system (e.g., laptop):
 
 ```bash
-pip install authlib
+python token_manager.py ensure --force-login --prompt-login --validate-iri
 ```
 
-Run `get_sfapi_token.py` in directory with the downloaded `clientid.txt` and `priv_key.pem` files.
+You may be prompted to authorize via Globus.
+
+If successful, token is written to `$HOME/.globus/auth_tokens.json`.
+
 
 ```bash
-export IRI_TOKEN="$(python get_sfapi_token.py)"
+export IRI_TOKEN=$(jq -r '.other_tokens[] | select(.scope|contains("iri_api")) | .access_token' "$HOME/.globus/auth_tokens.json")
 ```
 
 ## Submitting job on Perlmutter via IRI.
@@ -58,28 +50,11 @@ To get the correct resource ID for Perlmutter compute nodes:
 
 ```bash
 export IRI_BASE='https://api.iri.nersc.gov/api/v1'
-export RESOURCE_ID="$(curl -s -H "Authorization: Bearer $IRI_TOKEN" "$IRI_BASE/status/resources" | jq -r '.[] | select(.group=="perlmutter" and .resource_type=="compute" and .name=="compute") | .id')"
+export RESOURCE_ID=$(curl -s -H "Authorization: Bearer $IRI_TOKEN" $IRI_BASE/status/resources | jq -r '.[] | select(.group=="perlmutter" and .resource_type=="compute" and .name=="compute") | .id')
 ```
 
-THIS DOES NOT WORK... JUST COPY FILES TO PERLMUTTER
-If files need transferring (push user run scripts). Alternatively, have files in place.
+To submit job:
 
 ```bash
-export FS_RESOURCE_ID='59e80c79-4dfd-4c53-9c07-7405685fcd37'  # this can be obtained similar to RESOURCE_ID
-export UPLOAD_URL="$IRI_BASE/filesystem/upload/$FS_RESOURCE_ID"
-curl -X POST -H "Authorization: Bearer $IRI_TOKEN" -F "file=@run_libe.py" -F "path=$REMOTE_DIR/run_test/run_libe.py" "$UPLOAD_URL"
-curl -X POST -H "Authorization: Bearer $IRI_TOKEN" -F "file=@simf.py" -F "path=$REMOTE_DIR/run_test/simf.py" "$UPLOAD_URL"
-```
-
-Copying files normally.
-
-```bash
-scp run_libe.py perlmutter:/$REMOTE_DIR
-scp simf.py perlmutter:/$REMOTE_DIR
-```
-
-Run job.
-
-```bash
-curl -X POST -H "Authorization: Bearer $IRI_TOKEN" -H "Content-Type: application/json" "https://api.iri.nersc.gov/api/v1/compute/job/$RESOURCE_ID" -d @iri_req.json
+curl -X POST -H "Authorization: Bearer $IRI_TOKEN" -H "Content-Type: application/json" "$IRI_BASE/compute/job/$RESOURCE_ID" -d @iri_req.json
 ```
