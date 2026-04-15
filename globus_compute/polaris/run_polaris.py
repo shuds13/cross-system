@@ -15,9 +15,7 @@ def gpu_multiply(task_id, n=1000000):
     import socket
     import torch
 
-    gpu_id = task_id % torch.cuda.device_count()
-    torch.cuda.set_device(gpu_id)
-    device = f"cuda:{gpu_id}"
+    device = "cuda"
 
     a = torch.arange(1, n + 1, device=device)
     b = torch.full((n,), float(task_id), device=device)
@@ -26,9 +24,7 @@ def gpu_multiply(task_id, n=1000000):
     return {
         "task_id": task_id,
         "hostname": socket.gethostname(),
-        "gpu_id": gpu_id,
-        "device_name": torch.cuda.get_device_name(gpu_id),
-        "CUDA_VISIBLE_DEVICES": os.environ.get("CUDA_VISIBLE_DEVICES", "N/A"),
+        "GPU": os.environ.get("CUDA_VISIBLE_DEVICES"),
         "first": float(c[0].cpu()),
         "last": float(c[-1].cpu()),
     }

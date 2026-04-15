@@ -82,8 +82,8 @@ All 4 tasks on x3001c0s1b1n0, one per A100 GPU.
 
 ```bash
 python run_polaris.py
-{'task_id': 0, 'hostname': 'x3001c0s1b1n0', 'gpu_id': 0, 'device_name': 'NVIDIA A100-SXM4-40GB', 'CUDA_VISIBLE_DEVICES': '0', 'first': 0.0, 'last': 0.0}
-{'task_id': 1, 'hostname': 'x3001c0s1b1n0', 'gpu_id': 0, 'device_name': 'NVIDIA A100-SXM4-40GB', 'CUDA_VISIBLE_DEVICES': '1', 'first': 1.0, 'last': 1000000.0}
-{'task_id': 2, 'hostname': 'x3001c0s1b1n0', 'gpu_id': 0, 'device_name': 'NVIDIA A100-SXM4-40GB', 'CUDA_VISIBLE_DEVICES': '3', 'first': 2.0, 'last': 2000000.0}
-{'task_id': 3, 'hostname': 'x3001c0s1b1n0', 'gpu_id': 0, 'device_name': 'NVIDIA A100-SXM4-40GB', 'CUDA_VISIBLE_DEVICES': '2', 'first': 3.0, 'last': 3000000.0}
+{'task_id': 0, 'hostname': 'x3001c0s1b1n0', 'GPU': '0', 'first': 0.0, 'last': 0.0}
+{'task_id': 1, 'hostname': 'x3001c0s1b1n0', 'GPU': '1', 'first': 1.0, 'last': 1000000.0}
+{'task_id': 2, 'hostname': 'x3001c0s1b1n0', 'GPU': '3', 'first': 2.0, 'last': 2000000.0}
+{'task_id': 3, 'hostname': 'x3001c0s1b1n0', 'GPU': '2', 'first': 3.0, 'last': 3000000.0}
 ```
