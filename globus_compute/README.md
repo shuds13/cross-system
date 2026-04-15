@@ -16,6 +16,18 @@ manually set `CUDA_VISIBLE_DEVICES` or equivalent to avoid contention.
 With accelerator pinning, submitted functions don't need any device management
 code — they just run on whichever GPU the endpoint assigned.
 
+## Test Problem
+
+Each task multiplies two PyTorch tensors on a GPU:
+
+```
+a = [1, 2, 3, ..., n]     b = [task_id, task_id, ..., task_id]
+
+c = a * b  →  [task_id, 2*task_id, 3*task_id, ..., n*task_id]
+```
+
+Returns the first and last elements to verify correctness.
+
 ## Systems
 
 | System | GPUs/node | Accelerator type | Scheduler |

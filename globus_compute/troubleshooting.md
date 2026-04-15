@@ -96,6 +96,17 @@ The rendered submit script shows exactly what runs on the compute node:
 cat ~/.globus_compute/uep.*/submit_scripts/parsl.GlobusComputeEngine-HighThroughputExecutor.block-0.*[0-9]
 ```
 
+## Temp files cluttering home directory
+
+Parsl drops `cmd_parsl.*.sh` and `parsl.*.nodes` files in `$HOME` for each block
+(PBS job). One pair per block — if workers keep crashing, these multiply fast.
+
+Safe to delete after jobs finish:
+
+```bash
+rm -f ~/cmd_parsl.GlobusComputeEngine-* ~/parsl.GlobusComputeEngine-*
+```
+
 ## Useful log locations
 
 | Log | Path |
