@@ -87,3 +87,19 @@ python run_polaris.py
 {'task_id': 2, 'hostname': 'x3001c0s1b1n0', 'GPU': '3', 'first': 2.0, 'last': 2000000.0}
 {'task_id': 3, 'hostname': 'x3001c0s1b1n0', 'GPU': '2', 'first': 3.0, 'last': 3000000.0}
 ```
+
+## Example Output on 2 nodes (8 tasks)
+
+Tasks 0-3 on x3001c0s1b1n0, tasks 4-7 on x3001c0s1b0n0.
+
+```bash
+python run_polaris.py
+{'task_id': 0, 'hostname': 'x3001c0s1b1n0', 'GPU': '2', 'first': 0.0, 'last': 0.0}
+{'task_id': 1, 'hostname': 'x3001c0s1b1n0', 'GPU': '1', 'first': 1.0, 'last': 1000000.0}
+{'task_id': 2, 'hostname': 'x3001c0s1b1n0', 'GPU': '0', 'first': 2.0, 'last': 2000000.0}
+{'task_id': 3, 'hostname': 'x3001c0s1b1n0', 'GPU': '3', 'first': 3.0, 'last': 3000000.0}
+{'task_id': 4, 'hostname': 'x3001c0s1b0n0', 'GPU': '1', 'first': 4.0, 'last': 4000000.0}
+{'task_id': 5, 'hostname': 'x3001c0s1b0n0', 'GPU': '0', 'first': 5.0, 'last': 5000000.0}
+{'task_id': 6, 'hostname': 'x3001c0s1b0n0', 'GPU': '2', 'first': 6.0, 'last': 6000000.0}
+{'task_id': 7, 'hostname': 'x3001c0s1b0n0', 'GPU': '3', 'first': 7.0, 'last': 7000000.0}
+```
