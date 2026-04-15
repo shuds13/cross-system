@@ -1,0 +1,23 @@
+engine:
+  type: GlobusComputeEngine
+  available_accelerators: 4
+  max_workers_per_node: 4
+
+  provider:
+    type: PBSProProvider
+    launcher:
+      type: MpiExecLauncher
+      bind_cmd: "--cpu-bind"
+      overrides: "--ppn 1"
+
+    account: {{ account }}
+    queue: {{ queue }}
+    cpus_per_node: 64
+    scheduler_options: "#PBS -l filesystems=home:eagle"
+    worker_init: "module use /soft/modulefiles && module load conda && conda activate && source ~/venvs/gcompute/bin/activate && export TMPDIR=/tmp"
+    walltime: {{ walltime|default("00:30:00") }}
+
+    nodes_per_block: {{ num_nodes|default(1) }}
+    init_blocks: 0
+    min_blocks: 0
+    max_blocks: 1
