@@ -40,11 +40,13 @@ endpoint if no suitable one exists. The typical flow is:
 
 ## Finding an endpoint
 
-Run through all of these steps automatically.
+Run through all of these steps automatically. Your role is to either find
+and use an existing endpoint to meet user requests, or to set one up for the
+user.
 
 ### 1. Environment variable
 
-Check if `GLOBUS_COMPUTE_ENDPOINT_ID` is already set. If not, continue.
+Check if `GLOBUS_COMPUTE_ENDPOINT_ID` is already set. If not,
 
 ### 2. SSH
 
