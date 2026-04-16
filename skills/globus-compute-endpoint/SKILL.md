@@ -123,9 +123,40 @@ for the agent to use.
 ## What the agent does (from the local side)
 
 Everything below can be done non-interactively. The agent needs:
-- The endpoint UUID (from setup above)
-- SSH ControlMaster socket active
+- The endpoint UUID
 - `globus-compute-sdk` installed locally
+- SSH ControlMaster socket active (only for endpoint management/debugging)
+
+### Getting the endpoint UUID
+
+In order of preference:
+
+1. **Environment variable** — check if `GLOBUS_COMPUTE_ENDPOINT_ID` is already set.
+2. **SSH** — if a ControlMaster socket is active, run
+   `globus-compute-endpoint list` on the remote system (see Endpoint
+   management section below).
+3. **Cloud API** — if no env var and no SSH connection, query the Globus
+   Compute web service. Use `get_endpoint_metadata()` to find an online
+   endpoint whose template accepts the variables in `run_config.yaml`:
+   ```python
+   from globus_compute_sdk import Client
+   import yaml
+   c = Client()
+   with open("run_config.yaml") as f:
+       run_config_keys = set(yaml.safe_load(f).keys())
+   for ep in c.get_endpoints():
+       meta = c.get_endpoint_metadata(ep["uuid"])
+       status = c.get_endpoint_status(ep["uuid"])
+       if status.get("status") != "online":
+           continue
+       template = meta.get("user_config_template", "")
+       # Check that the template's Jinja2 variables match run_config keys
+       import re
+       template_vars = set(re.findall(r"\{\{\s*(\w+)", template))
+       if run_config_keys.issubset(template_vars):
+           print(f"Match: {ep['uuid']}  {ep.get('display_name', '?')}")
+   ```
+4. **Ask the user** — last resort.
 
 ## Submit jobs (local)
 
