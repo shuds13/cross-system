@@ -1,9 +1,10 @@
+import json
 import os
 import yaml
 from globus_compute_sdk import Executor
 
 ENDPOINT_ID = os.environ["GLOBUS_COMPUTE_ENDPOINT_ID"]
-NUM_TASKS = 4  # 1 node * 4 A100 GPUs
+NUM_TASKS = 8  # 2 nodes * 4 A100 GPUs
 
 with open("run_config.yaml") as f:
     USER_RUN_CONFIG = yaml.safe_load(f)
@@ -38,3 +39,7 @@ with Executor(
     results = [f.result() for f in futs]
     for r in results:
         print(r)
+
+with open("results.json", "w") as f:
+    for r in results:
+        f.write(json.dumps(r) + "\n")
