@@ -42,8 +42,9 @@ endpoint if no suitable one exists. The typical flow is:
 
 Run through all of these steps automatically. Your role is to either find
 and use an existing endpoint to meet user requests, or to set one up for the
-user. It is your job as agent to do these things, do you give user instructions,
-you must do them. Only ask the user if there is something you cannot find yourself.
+user. Do not ask the user for endpoint IDs, you can find them with the steps
+below. Only if you cannot find and run with an existing endpoint, go to
+setting one up.
 
 ### 1. Environment variable
 
@@ -51,11 +52,16 @@ Check if `GLOBUS_COMPUTE_ENDPOINT_ID` is already set. If not,
 
 ### 2. SSH
 
-If a ControlMaster socket is active, query the remote system:
+Check for an existing ControlMaster socket first:
+```bash
+ssh -O check <host> 2>&1
+```
+Only if a socket exists, query the remote system:
 ```bash
 ssh <host> '<setup> && globus-compute-endpoint list'
 ```
-If SSH fails or no socket exists, move to step 3.
+If no socket exists, skip to step 3. Never attempt interactive SSH —
+these systems require 2FA which the agent cannot handle.
 
 ### 3. Cloud API
 
