@@ -1,7 +1,7 @@
 # Globus Compute on Polaris
 
-Sends a batch of calculations that run on one A100 GPU each. By default, uses one node
-on Polaris (4 GPUs).
+Sends a batch of calculations that run on one A100 GPU each. By default, uses two nodes
+on Polaris (8 GPUs).
 
 The run configuration can be modified user side in `run_config.yaml`. You must set
 "account" to your ALCF project in this file.
