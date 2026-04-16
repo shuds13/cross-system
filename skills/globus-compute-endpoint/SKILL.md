@@ -24,148 +24,77 @@ Submit jobs locally, manage and debug endpoints via SSH.
 | Filesystems | home:eagle | home:flare |
 | cpus_per_node | 64 | 208 |
 
-## What the user does (on the HPC system)
+---
 
-These steps require interactive terminal access (2FA, Globus OAuth browser
-flow). The user does them once per endpoint. Give the user these
-instructions — do NOT attempt them via non-interactive SSH.
+## Order of operations
 
-### Setup script (recommended)
+Always find and use an existing endpoint first unless the user
+has specified they want a new one. Only set up a new
+endpoint if no suitable one exists. The typical flow is:
 
-Each system has a setup script at `globus_compute/<system>/setup_endpoint.sh`
-that handles both new and existing endpoints.
-
-1. SSH into the system: `ssh <host>`
-2. Run the setup script: `bash setup_endpoint.sh <endpoint_name>`
-3. If the endpoint already exists, it asks whether to reuse it — if yes,
-   it just starts it and prints the UUID. No reconfiguration needed.
-4. If new, follow the auth prompts (browser URL + paste code)
-5. Note the endpoint UUID printed at the end
-6. Exit the system (the endpoint keeps running as a daemon)
-
-### Manual steps (if not using setup script)
-
-**1. SSH into the HPC system**
-
-```
-ssh <host>
-```
-
-**2. Create a Python venv with globus-compute-endpoint**
-
-Polaris:
-```
-module use /soft/modulefiles && module load conda && conda activate && mkdir -p ~/venvs && python -m venv ~/venvs/gcompute --system-site-packages && source ~/venvs/gcompute/bin/activate && pip install globus-compute-endpoint
-```
-
-Aurora:
-```
-module load frameworks && mkdir -p ~/venvs && python -m venv ~/venvs/gcompute --system-site-packages && source ~/venvs/gcompute/bin/activate && pip install globus-compute-endpoint globus-compute-sdk
-```
-
-**3. Log in to Globus**
-
-```
-globus-compute-endpoint login
-```
-
-This opens a browser auth flow. Complete it once — tokens persist.
-
-**4. Configure the endpoint**
-
-```
-globus-compute-endpoint configure <endpoint_name>
-```
-
-**5. Deploy the j2 template**
-
-Copy the template into the endpoint config directory. Templates are in
-this repo at `globus_compute/<system>/globus_config_file/`.
-
-If on the HPC system with access to the repo, copy directly. Otherwise
-from a local terminal:
-```
-scp globus_compute/<system>/globus_config_file/user_config_template.yaml.j2 <user>@<host>:~/.globus_compute/<endpoint_name>/
-```
-
-The template configures `GlobusComputeEngine` with `available_accelerators`
-(swim lanes). Each worker gets exclusive access to one GPU — no manual
-device management needed in submitted functions.
-
-**6. Start the endpoint**
-
-```
-source ~/venvs/gcompute/bin/activate && globus-compute-endpoint start <endpoint_name>
-```
-
-Note the **endpoint UUID** from the output — needed for job submission.
-
-The endpoint daemonizes (forks to background). It survives SSH disconnection
-but NOT ctrl-c. The user can log out after starting it.
-
-### SSH ControlMaster (for agent access)
-
-The user's `~/.ssh/config` needs ControlMaster with ControlPersist so the
-agent can reuse the authenticated SSH connection:
-
-```
-Host <host>
-    ControlMaster auto
-    ControlPath ~/.ssh/master-%r@%h:%p
-    ControlPersist yes
-```
-
-The user SSHs in once (handles 2FA), then exits. The socket stays alive
-for the agent to use.
+1. **Find an endpoint** (see "Finding an endpoint" below)
+2. **Submit jobs** using that endpoint
+3. **Only if no endpoint found** — guide the user through setup
 
 ---
 
-## What the agent does (from the local side)
+## Finding an endpoint
 
-Everything below can be done non-interactively. The agent needs:
-- The endpoint UUID
-- `globus-compute-sdk` installed locally
-- SSH ControlMaster socket active (only for endpoint management/debugging)
+Run through all of these steps automatically.
 
-### Getting the endpoint UUID
+### 1. Environment variable
 
-In order of preference:
+Check if `GLOBUS_COMPUTE_ENDPOINT_ID` is already set. If not, continue.
 
-1. **Environment variable** — check if `GLOBUS_COMPUTE_ENDPOINT_ID` is already set.
-2. **SSH** — if a ControlMaster socket is active, run
-   `globus-compute-endpoint list` on the remote system (see Endpoint
-   management section below).
-3. **Cloud API** — if no env var and no SSH connection, query the Globus
-   Compute web service. Use `get_endpoint_metadata()` to find an online
-   endpoint whose template accepts the variables in `run_config.yaml`:
-   ```python
-   from globus_compute_sdk import Client
-   import yaml
-   c = Client()
-   with open("run_config.yaml") as f:
-       run_config_keys = set(yaml.safe_load(f).keys())
-   for ep in c.get_endpoints():
-       meta = c.get_endpoint_metadata(ep["uuid"])
-       status = c.get_endpoint_status(ep["uuid"])
-       if status.get("status") != "online":
-           continue
-       template = meta.get("user_config_template", "")
-       # Check that the template's Jinja2 variables match run_config keys
-       import re
-       template_vars = set(re.findall(r"\{\{\s*(\w+)", template))
-       if run_config_keys.issubset(template_vars):
-           print(f"Match: {ep['uuid']}  {ep.get('display_name', '?')}")
-   ```
-4. **Ask the user** — last resort.
+### 2. SSH
+
+If a ControlMaster socket is active, query the remote system:
+```bash
+ssh <host> '<setup> && globus-compute-endpoint list'
+```
+If SSH fails or no socket exists, move to step 3.
+
+### 3. Cloud API
+
+Query the Globus Compute web service. Use `get_endpoint_metadata()`
+to find an online endpoint whose template accepts the variables in
+`run_config.yaml`:
+
+```python
+from globus_compute_sdk import Client
+import yaml, re
+
+c = Client()
+with open("run_config.yaml") as f:
+    run_config_keys = set(yaml.safe_load(f).keys())
+for ep in c.get_endpoints():
+    try:
+        meta = c.get_endpoint_metadata(ep["uuid"])
+        status = c.get_endpoint_status(ep["uuid"])
+        if status.get("status") != "online":
+            continue
+        template = meta.get("user_config_template", "")
+        template_vars = set(re.findall(r"\{\{\s*(\w+)", template))
+        if run_config_keys.issubset(template_vars):
+            print(f"Match: {ep['uuid']}  {ep.get('display_name', '?')}")
+    except Exception:
+        pass
+```
+
+### 4. Set up a new endpoint
+
+If the Cloud API returned no online endpoints, set one up (see
+"Setting up a new endpoint" below).
+
+---
 
 ## Submit jobs (local)
 
-Use `globus_compute/<system>/run_<system>.py` with the endpoint UUID:
+After finding the endpoint UUID via the steps above, run the job.
+Pass the UUID as the `GLOBUS_COMPUTE_ENDPOINT_ID` env var:
 
 ```bash
-export GLOBUS_COMPUTE_ENDPOINT_ID=<uuid>
-cd globus_compute/<system>
-python run_<system>.py
+GLOBUS_COMPUTE_ENDPOINT_ID=<uuid> python globus_compute/<system>/run_<system>.py
 ```
 
 Or submit programmatically:
@@ -189,11 +118,12 @@ The `user_endpoint_config` dict fills Jinja2 variables in the j2 template
 
 ### Expected output
 
-**Polaris (1 node):** 4 results, each with a different CUDA_VISIBLE_DEVICES
-(0–3), all on the same hostname.
+**Polaris:** One result per GPU (4 per node). Each result has a different
+CUDA_VISIBLE_DEVICES value. Results from the same node share a hostname.
 
-**Aurora (1 node):** 12 results, each with a different ZE_AFFINITY_MASK,
-all on the same hostname.
+**Aurora:** One result per GPU tile (12 per node). Each result has a
+different ZE_AFFINITY_MASK value. Results from the same node share a
+hostname.
 
 ### CRITICAL: Executor management
 
@@ -203,6 +133,82 @@ all on the same hostname.
   through allocation hours invisibly.
 - **Reuse a single Executor** for all submissions in a session.
 - Use the context manager (`with Executor(...) as ex:`) to ensure cleanup.
+
+---
+
+## Setting up a new endpoint (only if none found)
+
+Only do this if the "Finding an endpoint" steps above all failed — there
+is no existing endpoint the user can use.
+
+Do not assume what is or isn't already on the remote system. The setup
+script should check what exists (venv, endpoint config, etc.) and only
+create what's missing. The agent's job is to prepare everything locally
+and minimise what the user has to do on the remote side.
+
+### Agent responsibilities
+
+1. **Create a setup script** for the target system (or use an existing
+   one from the repo if available at `globus_compute/<system>/setup_endpoint.sh`).
+   The script should handle venv creation, endpoint configuration, j2
+   template deployment, and starting the endpoint. Use the system table
+   above for module setup commands, filesystems, etc.
+
+2. **SCP the setup script and j2 template** to the user's home directory
+   on the remote system. If no SSH socket is available, give the user
+   the SCP commands to run themselves.
+
+   ```bash
+   scp setup_endpoint.sh <user>@<host>:~/
+   scp user_config_template.yaml.j2 <user>@<host>:~/
+   ```
+
+3. **Tell the user to SSH in and run the script.** The remote steps
+   require interactive terminal access (2FA, Globus OAuth browser flow)
+   so the agent cannot do them. Give the user these instructions:
+
+   1. SSH into the system: `ssh <host>`
+   2. Run the setup script: `bash ~/setup_endpoint.sh <endpoint_name>`
+   3. If the endpoint already exists, it asks whether to reuse it — if
+      yes, it just starts it and prints the UUID
+   4. If new, follow the auth prompts (browser URL + paste code)
+   5. Note the endpoint UUID printed at the end
+   6. Exit the system (the endpoint keeps running as a daemon)
+
+### What the setup script should do
+
+The setup script automates these manual steps so the user only runs one
+command. For reference, the manual steps are:
+
+1. Load modules and create a Python venv with `globus-compute-endpoint`
+   (using `--system-site-packages` so HPC packages are available)
+2. `globus-compute-endpoint configure <endpoint_name>`
+3. Copy the j2 template into `~/.globus_compute/<endpoint_name>/`
+4. `globus-compute-endpoint start <endpoint_name>`
+
+The j2 template configures `GlobusComputeEngine` with `available_accelerators`
+(swim lanes). Each worker gets exclusive access to one GPU — no manual
+device management needed in submitted functions.
+
+The endpoint daemonizes (forks to background). It survives SSH disconnection
+but NOT ctrl-c. The user can log out after starting it.
+
+### SSH ControlMaster (for agent access)
+
+The user's `~/.ssh/config` needs ControlMaster with ControlPersist so the
+agent can reuse the authenticated SSH connection:
+
+```
+Host <host>
+    ControlMaster auto
+    ControlPath ~/.ssh/master-%r@%h:%p
+    ControlPersist yes
+```
+
+The user SSHs in once (handles 2FA), then exits. The socket stays alive
+for the agent to use.
+
+---
 
 ## Endpoint management (via SSH)
 
