@@ -42,7 +42,8 @@ endpoint if no suitable one exists. The typical flow is:
 
 Run through all of these steps automatically. Your role is to either find
 and use an existing endpoint to meet user requests, or to set one up for the
-user.
+user. It is your job as agent to do these things, do you give user instructions,
+you must do them. Only ask the user if there is something you cannot find yourself.
 
 ### 1. Environment variable
 

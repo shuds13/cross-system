@@ -1,4 +1,4 @@
-account: <your-polaris-project>
+account: datascience
 queue: debug
 num_nodes: 2
 walltime: "00:10:00"
