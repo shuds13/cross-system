@@ -33,13 +33,15 @@ instructions — do NOT attempt them via non-interactive SSH.
 ### Setup script (recommended)
 
 Each system has a setup script at `globus_compute/<system>/setup_endpoint.sh`
-that automates venv creation, login, configure, j2 deploy, and start.
+that handles both new and existing endpoints.
 
 1. SSH into the system: `ssh <host>`
 2. Run the setup script: `bash setup_endpoint.sh <endpoint_name>`
-3. Follow the auth prompts (browser URL + paste code)
-4. Note the endpoint UUID printed at the end
-5. Exit the system (the endpoint keeps running as a daemon)
+3. If the endpoint already exists, it asks whether to reuse it — if yes,
+   it just starts it and prints the UUID. No reconfiguration needed.
+4. If new, follow the auth prompts (browser URL + paste code)
+5. Note the endpoint UUID printed at the end
+6. Exit the system (the endpoint keeps running as a daemon)
 
 ### Manual steps (if not using setup script)
 
