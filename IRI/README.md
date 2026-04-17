@@ -56,3 +56,12 @@ python submit_job.py alcf --read-output /home/<you>/iri_job_outputs/iri-run-2026
 | NERSC | compute | homes |
 
 Both facilities are built into the SDK (v0.4.2+). The API is identical across facilities — only config values (resource names, paths, queues) differ.
+
+## Troubleshooting
+
+### Persistent 401 errors after authenticating
+
+If you complete the Globus login but still get `AuthenticationError: Authentication failed (401)`, your browser may be reusing a cached Globus session with a different identity. To fix:
+
+1. Clear your browser cookies for `globus.org` (where the auth code is provided)
+2. Re-run the script — it will prompt a fresh login
