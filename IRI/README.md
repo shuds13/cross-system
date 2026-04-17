@@ -65,3 +65,11 @@ If you complete the Globus login but still get `AuthenticationError: Authenticat
 
 1. Clear your browser cookies for `globus.org` (where the auth code is provided)
 2. Re-run the script — it will prompt a fresh login
+
+If that doesn't help, a stale token may be cached locally. Delete it and re-authenticate:
+
+```
+rm ~/.amsc/credentials.json
+```
+
+This clears tokens for all facilities — you'll be prompted to log in again on next run.
