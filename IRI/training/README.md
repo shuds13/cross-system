@@ -1,7 +1,7 @@
 # Distributed Training via IRI
 
 Runs `ezpz.examples.test` (MNIST MLP) across ALCF and NERSC using the amsc-client SDK.
-Environments are pre-staged on each facility so jobs start instantly with no runtime installs.
+Environments are pre-staged on each facility, and referenced by entry in `envs.yaml`.
 
 ## Setup (once per facility)
 
@@ -28,7 +28,7 @@ python submit_job_ezpz.py <facility> --account <account> --username <username> -
 python submit_job_torchrun.py <facility> --account <account> --username <username> --nodes <num_nodes>
 ```
 
-Both scripts read `envs.yaml` for the venv path and modules to load.
+Both scripts read `envs.yaml` for the venv path and modules to load. `<facility>` is `alcf` or `nersc`.
 
 ## Files
 
