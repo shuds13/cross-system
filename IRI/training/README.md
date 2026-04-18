@@ -7,13 +7,12 @@ Environments are pre-staged on each facility so jobs start instantly with no run
 
 **NERSC:**
 ```
-bash setup_nersc_env.sh
+bash setup_nersc_perlmutter_env/ezpz.sh
 ```
 Creates a venv at `$SCRATCH/amsc-envs/ezpz` with ezpz and mpi4py installed.
 
 **ALCF:** setup script not yet created — see `envs.yaml` for the expected venv path.
 
-After setup, update `envs.yaml` if your venv landed at a different path.
 
 ## Submit
 
@@ -32,9 +31,9 @@ Both scripts read `envs.yaml` for the venv path and modules to load.
 | File | Purpose |
 |------|---------|
 | `envs.yaml` | Catalog of pre-staged venv paths and modules per facility |
-| `setup_nersc_env.sh` | One-time venv setup script for Perlmutter login node |
-| `submit_job_ezpz.py` | Submit using `ezpz launch` (SLURM-native srun launcher) |
-| `submit_job_torchrun.py` | Submit using `torchrun` (avoids srun step overhead) |
+| `setup_nersc_perlmutter_env/ezpz.sh` | One-time venv setup script for Perlmutter login node |
+| `submit_job_ezpz.py` | Submit using `ezpz launch` |
+| `submit_job_torchrun.py` | Submit using `torchrun` |
 
 ## Requirements (local)
 

@@ -89,12 +89,8 @@ def submit_job(facility, config, args):
             custom_attrs.additional_properties[k] = v
 
     env_cfg = _load_env_config(args.facility)
-    modules = env_cfg.get("modules") or []
-    venv = env_cfg["venv"]
-    parts = []
-    if modules:
-        parts.append("module load " + " ".join(modules))
-    parts.append(f"source {venv}/bin/activate")
+    parts = list(env_cfg.get("setup") or [])
+    parts.append(f"source {env_cfg['venv']}/bin/activate")
     parts.append("ezpz launch python3 -m ezpz.examples.test")
     cmd = " && ".join(parts)
 
@@ -106,7 +102,7 @@ def submit_job(facility, config, args):
         name=job_name,
         stdout_path=f"{output_dir}/{job_name}.stdout",
         stderr_path=f"{output_dir}/{job_name}.stderr",
-        resources=ResourceSpec(node_count=args.nodes, processes_per_node=args.gpus_per_node, gpu_cores_per_process=1),
+        resources=ResourceSpec(node_count=args.nodes),
         attributes=JobAttributes(
             duration=args.duration,
             queue_name=config["queue"],
@@ -138,14 +134,18 @@ def monitor_job(job, timeout, poll_interval=5):
 
 
 def read_output(facility, config, path):
-    """Read a file from the facility filesystem."""
+    """Read stdout and stderr from the facility filesystem."""
+    import re
+    ansi_escape = re.compile(r'\x1b\[[0-9;]*m')
     fs = facility.resource(config["fs_resource"])
-    try:
-        task = fs.fs.head(path, lines=50)
-        task.wait(timeout=60)
-        print(f"\n── {path} ──\n{task.result}")
-    except ApiError as e:
-        print(f"Could not read output: {e}")
+    for label, p in [("stdout", path), ("stderr", path.replace(".stdout", ".stderr"))]:
+        try:
+            head_task = fs.fs.head(p, lines=50)
+            head_task.wait(timeout=60)
+            content = ansi_escape.sub("", head_task.result["output"]["content"])
+            print(f"\n── {label} (head) ──\n{content}")
+        except ApiError as e:
+            print(f"Could not read {label}: {e}")
 
 
 def main():

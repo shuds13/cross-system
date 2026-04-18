@@ -1,27 +1,27 @@
 # Pre-staged environment catalog.
-# Each user creates their venv using the setup_<facility>_env.sh scripts,
+# Each user creates their venv using the setup_<facility>_env/ scripts,
 # then sets the path here. Shell variables ($SCRATCH, $HOME) are expanded at job runtime.
 
 nersc:
   ezpz:
     venv: $SCRATCH/amsc-envs/ezpz
-    modules:
-      - cudatoolkit/12.9
-      - nccl/2.24.3
-      - pytorch
-      - cray-mpich
+    setup:
+      - module load cudatoolkit/12.9 nccl/2.24.3 pytorch cray-mpich
   torchrun:
     venv: $SCRATCH/amsc-envs/ezpz
-    modules:
-      - cudatoolkit/12.9
-      - nccl/2.24.3
-      - pytorch
-      - cray-mpich
+    setup:
+      - module load cudatoolkit/12.9 nccl/2.24.3 pytorch cray-mpich
 
 alcf:
   ezpz:
     venv: $HOME/amsc-envs/ezpz
-    modules: []
+    setup:
+      - module use /soft/modulefiles
+      - module load conda
+      - conda activate
   torchrun:
     venv: $HOME/amsc-envs/ezpz
-    modules: []
+    setup:
+      - module use /soft/modulefiles
+      - module load conda
+      - conda activate
