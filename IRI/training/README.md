@@ -19,7 +19,6 @@ bash setup_alcf_polaris_env/ezpz.sh
 ## Submit
 
 ```
-# Using ezpz launch
 python submit_job_ezpz.py <facility> --account <account> --username <username> --nodes <num_nodes>
 ```
 
