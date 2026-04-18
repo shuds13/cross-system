@@ -34,6 +34,7 @@ Both scripts read `envs.yaml` for the venv path and modules to load. `<facility>
 |------|---------|
 | `envs.yaml` | Catalog of pre-staged venv paths and modules per facility |
 | `setup_nersc_perlmutter_env/ezpz.sh` | One-time venv setup script for Perlmutter login node |
+| `setup_alcf_polaris_env/ezpz.sh` | One-time venv setup script for Polaris login node |
 | `submit_job_ezpz.py` | Submit using `ezpz launch` |
 | `submit_job_torchrun.py` | Submit using `torchrun` |
 
