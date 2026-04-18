@@ -21,10 +21,11 @@ bash setup_alcf_polaris_env/ezpz.sh
 ```
 # Using ezpz launch
 python submit_job_ezpz.py <facility> --account <account> --username <username> --nodes <num_nodes>
-
-# Using torchrun
-python submit_job_torchrun.py <facility> --account <account> --username <username> --nodes <num_nodes>
 ```
+
+<!--# Using torchrun
+python submit_job_torchrun.py <facility> --account <account> --username <username> --nodes <num_nodes>-->
+
 
 Both scripts read `envs.yaml` for the venv path and modules to load. `<facility>` is `alcf` or `nersc`.
 
