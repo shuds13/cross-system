@@ -11,17 +11,21 @@ bash setup_nersc_perlmutter_env/ezpz.sh
 ```
 Creates a venv at `$SCRATCH/amsc-envs/ezpz` with ezpz and mpi4py installed.
 
-**ALCF:** setup script not yet created — see `envs.yaml` for the expected venv path.
+**ALCF (Polaris):**
+```
+bash setup_alcf_polaris_env/ezpz.sh
+```
+Creates a venv at `$HOME/amsc-envs/ezpz` with ezpz and mpi4py installed.
 
 
 ## Submit
 
 ```
 # Using ezpz launch
-python submit_job_ezpz.py nersc --account <account> --username <username>
+python submit_job_ezpz.py <facility> --account <account> --username <username> --nodes <num_nodes>
 
 # Using torchrun
-python submit_job_torchrun.py nersc --account <account> --username <username>
+python submit_job_torchrun.py <facility> --account <account> --username <username> --nodes <num_nodes>
 ```
 
 Both scripts read `envs.yaml` for the venv path and modules to load.
