@@ -9,13 +9,11 @@ Environments are pre-staged on each facility, and referenced by entry in `envs.y
 ```
 bash setup_nersc_perlmutter_env/ezpz.sh
 ```
-Creates a venv at `$SCRATCH/amsc-envs/ezpz` with ezpz and mpi4py installed.
 
 **ALCF (Polaris):**
 ```
 bash setup_alcf_polaris_env/ezpz.sh
 ```
-Creates a venv at `$HOME/amsc-envs/ezpz` with ezpz and mpi4py installed.
 
 
 ## Submit
