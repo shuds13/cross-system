@@ -1,4 +1,4 @@
-# ezpz Distributed Training via IRI
+# Distributed Training via IRI
 
 Runs `ezpz.examples.test` (MNIST MLP) across ALCF and NERSC using the amsc-client SDK.
 Environments are pre-staged on each facility so jobs start instantly with no runtime installs.
