@@ -5,7 +5,7 @@ Environments are pre-staged on each facility, and referenced by entry in `envs.y
 
 ## Setup (once per facility)
 
-**NERSC:**
+**NERSC (Perlmutter):**
 ```
 bash setup_nersc_perlmutter_env/ezpz.sh
 ```
