@@ -5,14 +5,14 @@ Works with any IRI-compliant facility (ALCF, NERSC). The SDK provides a
 uniform API — only configuration values differ between sites.
 
 Usage:
-    python submit_job.py alcf --account datascience --username shudson
-    python submit_job.py nersc --account amsc013 --username shuds
+    python submit_job.py alcf --account <account> --username <username>
+    python submit_job.py nersc --account <account> --username <username>
     python submit_job.py alcf --explore-only
 
 The job is monitored and output returned. Use "--monitor-timeout 0" to not monitor.
 
 If output is not returned in monitoring time, a command to read output later will be shown. E.g.:
-    python submit_job.py alcf --read-output /home/shudson/iri_job_outputs/iri-run-20260417-153000.stdout
+    python submit_job.py alcf --read-output /home/<username>/iri_job_outputs/<job_name>.stdout
 """
 
 import argparse
